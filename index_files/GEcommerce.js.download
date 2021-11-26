@@ -1,0 +1,447 @@
+/**
+ * GEcommerce
+ * 
+ * Wrapper functionality about GTag Ecommerce enhanced
+ * @see https://developers.google.com/analytics/devguides/collection/gtagjs/enhanced-ecommerce?hl=en for more info about this functionality. 
+ * 
+ * @usage var ge = new GEcommerce(true, 'UA-XXXXX-Y');
+ */
+class GEcommerce {
+    
+    constructor(isActive = false) {
+        
+        this.isActiveProp = isActive;
+        
+    }
+    
+    /**
+     * Set status active.
+     * 
+     * @param boolean status
+     * @returns void
+     */
+    setIsActive (status = false) {
+        if (typeof status === 'boolean') {
+            this.isActiveProp = status;
+        }
+    }
+    
+    /**
+     * Get actual status.
+     * 
+     * @returns boolean
+     */
+    isActive() {
+        return this.isActiveProp;
+    }
+    
+    /**
+     * The following item parameters represent information about a product that has been viewed:
+     * 
+     * @param json items
+     * [{   
+     *      id              string      Yes*	Unique ID/SKU for the item.
+     *      name            string      Yes*	Item name.
+     *      list_name       string      No	The list in which the item was presented to the user
+     *      brand           string      No	Brand of the item
+     *      category        string      No	Item category
+     *      variant         string      No	Item variant
+     *      list_position   integer     No	The position of the item in the list
+     *      price           currency	No	Purchase price of the item
+     * },...]
+     * 
+     * @returns void
+     */
+    viewItemList(items = null) {
+        if (this.isActive()) {
+            gtag('event', 'view_item_list', {
+                "items": items 
+            });
+        }
+    }
+    
+    /**
+     * The following item parameters represent information about a product clicked:
+     * 
+     * @param json items
+     * [{   
+     *      id              string	Yes*	Unique ID/SKU for the item.
+     *      name            string	Yes*	Item name.
+     *      list_name       string      No	The list in which the item was presented to the user
+     *      brand           string	No	Brand of the item
+     *      category        string	No	Item category
+     *      variant         string	No	Item variant
+     *      price           currency	No	Purchase price of the item
+     *      quantity        integer	No	Item quantity
+     *      coupon          string	No	Coupon code for a purchasable item
+     *      list_position   integer	No	The position of the item in the list
+     * },...]
+     * 
+     * @returns void
+     */
+    productClick(items = null) {
+        if (this.isActive()) {
+            gtag('event', 'select_content', {
+                "content_type" : "product",
+                "items": items 
+            });
+        }
+    }
+    
+    /**
+     * The following item parameters represent information about a product that was viewed:
+     * 
+     * @param json items
+     * [{   
+     *      id              string	Yes*	Unique ID/SKU for the item.
+     *      name            string	Yes*	Item name.
+     *      list_name       string      No	The list in which the item was presented to the user
+     *      brand           string	No	Brand of the item
+     *      category        string	No	Item category
+     *      variant         string	No	Item variant
+     *      price           currency	No	Purchase price of the item
+     *      quantity        integer	No	Item quantity
+     *      coupon          string	No	Coupon code for a purchasable item
+     *      list_position   integer	No	The position of the item in the list
+     * },...]
+     * 
+     * @returns void
+     */
+    productDetailView(items = null) {
+        if (this.isActive()) {
+            gtag('event', 'view_item', {
+                "items": items
+            });
+        }
+    }
+    
+    /**
+     * The following promotion parameters represent information about a promotion that has been viewed:
+     * 
+     * @param json promotions
+     * [{
+     *      id              string	Yes*	Promotion ID.
+     *      name            string	Yes*	Name of promotion.
+     *      creative_name   string	No	The name of a creative used
+     *      creative_slot   string	No	The name of the creative slot
+     * },...]
+     * @returns void
+     */
+    promotionView(promotions = null) {
+        if (this.isActive()) {
+            gtag('event', 'view_promotion', {
+                "promotions": promotions 
+            });
+        }
+    }
+    
+    /**
+     * The following promotion parameters represent information about a promotion that has been viewed:
+     * 
+     * @param json promotions
+     * [{
+     *      id              string	Yes*	Promotion ID.
+     *      name            string	Yes*	Name of promotion.
+     *      creative_name   string	No	The name of a creative used
+     *      creative_slot   string	No	The name of the creative slot
+     * },...]
+     * @returns void
+     */
+    promotionClick(promotions = null) {
+        if (this.isActive()) {
+            gtag('event', 'select_content', {
+                "promotions": promotions 
+            });
+        }
+    }
+    
+    /**
+     * To create a promotion click
+     * 
+     * @param Array promotions
+     * @returns JSON
+     */
+    createPromotionClick(promotions = null) {
+        this.promotionClick(JSON.stringify(promotions));
+    }
+    
+    /**
+     * The following item parameters represent information about a product added to a shopping cart:
+     * 
+     * @param json items
+     * [{   
+     *      id              string	Yes*	Unique ID/SKU for the item.
+     *      name            string	Yes*	Item name.
+     *      list_name       string      No	The list in which the item was presented to the user
+     *      brand           string	No	Brand of the item
+     *      category        string	No	Item category
+     *      variant         string	No	Item variant
+     *      price           currency	No	Purchase price of the item
+     *      quantity        integer	No	Item quantity
+     *      coupon          string	No	Coupon code for a purchasable item
+     *      list_position   integer	No	The position of the item in the list
+     * },...]
+     * 
+     * @returns void
+     */
+    addProduct(items = null) {
+        if (this.isActive()) {
+            gtag('event', 'add_to_cart', {
+                "items": [items]
+            });
+        }
+    }
+    
+    /**
+     * Function to create item json for add_to_cart gtag
+     * 
+     * @param json DTO item
+     * @param int quantity
+     * @returns json
+     */
+    addToShoppingCart(item, quantity) {
+        
+        item.quantity = quantity;
+        this.addProduct(item);
+    }
+    
+    /**
+     * Function to create item json for remove_from_cart gtag
+     * 
+     * @param json DTO item
+     * @param int quantity
+     * @returns json
+     */
+    removeToShoppingCart(item, quantity) {
+        
+        item.quantity = quantity;
+        this.removeProduct([item]);
+    }
+    
+    /**
+     * The following item parameters represent information about a product deleted from a shopping cart:
+     * 
+     * @param json items
+     * [{   
+     *      id              string	Yes*	Unique ID/SKU for the item.
+     *      name            string	Yes*	Item name.
+     *      list_name       string      No	The list in which the item was presented to the user
+     *      brand           string	No	Brand of the item
+     *      category        string	No	Item category
+     *      variant         string	No	Item variant
+     *      price           currency	No	Purchase price of the item
+     *      quantity        integer	No	Item quantity
+     *      coupon          string	No	Coupon code for a purchasable item
+     *      list_position   integer	No	The position of the item in the list
+     * },...]
+     * 
+     * @returns void
+     */
+    removeProduct(items = null) {
+        if (this.isActive()) {
+            gtag('event', 'remove_from_cart', {
+                "items": items 
+            });
+        }
+    }
+    
+    /**
+     * To track the first checkout step, send a begin_checkout event with the checkout items:
+     * 
+     * @param json items
+     * [{   
+     *      id              string	Yes*	Unique ID/SKU for the item.
+     *      name            string	Yes*	Item name.
+     *      list_name       string      No	The list in which the item was presented to the user
+     *      brand           string	No	Brand of the item
+     *      category        string	No	Item category
+     *      variant         string	No	Item variant
+     *      price           currency	No	Purchase price of the item
+     *      quantity        integer	No	Item quantity
+     *      coupon          string	No	Coupon code for a purchasable item
+     *      list_position   integer	No	The position of the item in the list
+     * },...]
+     * 
+     * @param string coupon
+     * 
+     * @returns void
+     */
+    beginCheckout(items = null, coupon = "") {
+        if (this.isActive()) {
+            gtag('event', 'begin_checkout', {
+                "items": items,
+                "coupon": coupon
+            });
+        }
+    }
+    
+    /**
+     * To track each subsequent checkout step, send a checkout_progress event with the checkout items:
+     * 
+     * @value integer Value (i.e. revenue) associated with the event
+     * 
+     * @currency string Purchase currency in 3-letter ISO_4217 format
+     * 
+     * @param json items
+     * [{   
+     *      id              string	Yes*	Unique ID/SKU for the item.
+     *      name            string	Yes*	Item name.
+     *      list_name       string      No	The list in which the item was presented to the user
+     *      brand           string	No	Brand of the item
+     *      category        string	No	Item category
+     *      variant         string	No	Item variant
+     *      price           currency	No	Purchase price of the item
+     *      quantity        integer	No	Item quantity
+     *      coupon          string	No	Coupon code for a purchasable item
+     *      list_position   integer	No	The position of the item in the list
+     * },...]
+     * 
+     * @param string Coupon code for a purchasable item
+     * 
+     * @checkout_step integer Used for ecommerce events
+     * 
+     * @checkout_option string Used for ecommerce events
+     * 
+     * @returns void
+     */
+    checkoutProgress(items = null, checkout_step = null, checkout_option = null, coupon = "") {
+        if (this.isActive()) {
+            gtag('event', 'checkout_progress', {
+                "items": items,
+                "checkout_step": checkout_step,
+                "checkout_option" : checkout_option,
+                "coupon": coupon
+            });
+        }
+    }
+    
+    /**
+     * To track a checkout option, send a set_checkout_option event with the checkout option:
+     * 
+     * @checkout_step integer Used for ecommerce events
+     * 
+     * @checkout_option string Used for ecommerce events
+     * 
+     * @returns void
+     */
+    setCheckoutOption(checkout_step = null, checkout_option = null) {
+        if (this.isActive()) {
+            gtag('event', 'set_checkout_option', {
+                "checkout_step": checkout_step,
+                "checkout_option": checkout_option
+            });
+        }
+    }
+    
+    /**
+     * To track a transaction, send a purchase event with the items in the transaction
+     * 
+     * @param json params
+     * * [{   
+     *      transaction_id  string	Yes*	Unique ID for the transaction.
+     *      affiliation     string	No	The store or affiliation from which this transaction occurred
+     *      value           number      No	Value (i.e., revenue) associated with the event
+     *      currency        string	No	Brand of the item
+     *      tax             currency	No	Tax amount
+     *      shipping        currency	No	Shipping cost
+     * },...]
+     * 
+     * @param json items
+     * [{   
+     *      id              string	Yes*	Unique ID/SKU for the item.
+     *      name            string	Yes*	Item name.
+     *      list_name       string      No	The list in which the item was presented to the user
+     *      brand           string	No	Brand of the item
+     *      category        string	No	Item category
+     *      variant         string	No	Item variant
+     *      price           currency	No	Purchase price of the item
+     *      quantity        integer	No	Item quantity
+     *      coupon          string	No	Coupon code for a purchasable item
+     *      list_position   integer	No	The position of the item in the list
+     * },...]
+     *
+     * @returns void
+     */
+    purchase(params = null, items = null){
+        if (this.isActive()) {
+            gtag('event', 'purchase', {
+                "transaction_id": params.transactionId,
+                "affiliation": params.affiliation,
+                "value": params.value,
+                "currency": params.currency,
+                "tax": params.tax,
+                "shipping": params.shipping,
+                "items": items
+            });
+        }
+    }
+    
+    /**
+     * To track a full refund of a transaction, send a refund event with the transaction ID
+     * 
+     * @param string transactionId
+     * @returns void
+     */
+    trackFullRefund(transactionId = null) {
+        if (this.isActive()) {
+            gtag('event', 'refund', { 
+                "transaction_id": transactionId
+            });
+        }
+    }
+    
+    /**
+     * To track a partial refund, send a refund event with the transaction ID and the items to be refunded
+     * 
+     * @param json items
+     * [{   
+     *      id              string	Yes*	Unique ID/SKU for the item.
+     *      name            string	Yes*	Item name.
+     *      list_name       string      No	The list in which the item was presented to the user
+     *      brand           string	No	Brand of the item
+     *      category        string	No	Item category
+     *      variant         string	No	Item variant
+     *      price           currency	No	Purchase price of the item
+     *      quantity        integer	No	Item quantity
+     *      coupon          string	No	Coupon code for a purchasable item
+     *      list_position   integer	No	The position of the item in the list
+     * },...]
+     * 
+     * @param json data
+     * [{
+     *      transaction_id  string	Yes*	Unique ID for the transaction.
+     *      affiliation     string	No	The store or affiliation from which this transaction occurred
+     *      value           number	No	Value (i.e., revenue) associated with the event
+     *      currency        string      No      Code of currency ex: USD EUR
+     *      tax             currency    No	Tax amount
+     *      shipping        currency	No	Shipping cost
+     * 
+     * },...] 
+     * 
+     * @returns void
+     */
+    trackPartialRefund(items = null, data = {}) {
+        if (this.isActive()) {
+            if(!data.hasOwnProperty("transaction_id")) {
+                console.error("transaction_id is required");
+            } else {
+                data.items = items;
+                gtag('event', 'refund', data);
+            }
+        }
+    }
+    
+    dataLayer(myEventName = 'myEventName', items = null, weight = null) {
+        if (this.isActive()) {
+            
+            window.dataLayer = window.dataLayer || [];
+            
+            dataLayer.push ({
+                'event': myEventName,
+                'items': items,
+                'weight': weight
+            });
+        }
+    }
+    
+}

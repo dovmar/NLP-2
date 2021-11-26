@@ -1,0 +1,1 @@
+function clientLogout(event){event.preventDefault();$.ajax({async:true,type:"POST",url:validateURL.URL()+'/client/account_logout',success:function(result){document.location.reload();},timeout:10000});}$(document).on('click','[data-action="logout"]',function(event){event.preventDefault();clientLogout(event);});

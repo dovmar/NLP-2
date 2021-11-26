@@ -1,0 +1,1 @@
+var Messages={"texts":{},"addText":function(abr,value){Messages.texts[abr]=value;},"getText":function(abr){return Messages.texts[abr];},"parseMessage":function(message_key,vars){var msg=Messages.getText(message_key);$.each(vars,function(key,val){msg=msg.replace('['+key.toUpperCase()+']',val);});return msg;}};
