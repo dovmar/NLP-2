@@ -9,3 +9,7 @@ Papildoma užduotis:
 užklausos) per API.
 - Paleisti virtualu asistenta ant debesu kompiuterijoje veikiancio puslapio.
 1
+
+
+
+[Click here to see the assistant in action](https://dovmar.github.io/NLP-2/)
