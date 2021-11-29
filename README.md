@@ -12,4 +12,4 @@ užklausos) per API.
 
 
 
-[Click here to see the assistant in action](https://dovmar.github.io/NLP-2/)
+[Asistentas gali būti pamatytas čia](https://dovmar.github.io/NLP-2/)
