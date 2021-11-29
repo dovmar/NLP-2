@@ -1,8 +1,16 @@
-from flask import Flask
+from flask import Flask, request
 from flask_assistant import Assistant, ask, tell, context_manager, event
 import pandas as pd
 import numpy as np
 import os
+
+
+#"queryResult": 
+#"sentimentAnalysisResult": {
+#            "queryTextSentiment": {
+#                "score": -0.4,
+#                "magnitude": 0.4
+#            }
 
 app = Flask(__name__)
 assist = Assistant(app, route='/',project_id="paskaita-vdul")
@@ -31,36 +39,55 @@ def available_items_action():
 
 @assist.action('find_category')
 def find_category_action(category):
-    return tell("You can find " + category + " in " + dictionary_of_urls[category])
-
+    try: 
+        return tell("You can find " + category + " in " + dictionary_of_urls[category])
+    except KeyError:
+        return tell("I'm not sure what category of items you are looking for")
 
 @assist.action('find_items',mapping={'price': 'sys.unit-currency'},default={"price_status":"cheap"})
 def find_items_action(category,price_status,price,size):
     
     global df_items
     df_items = df[df["subtype"]==category]
+    
     if size is not None:
         size_series = df_items.iloc[:,8] * df_items.iloc[:,9] * df_items.iloc[:,10]
         size_max = size_series.max()
         if size == "small":
             df_items = df_items[size_series < size_max * 0.25]
-        elif size == "small":
+        elif size == "medium":
             df_items = df_items[(size_series > size_max * 0.25) & (size_series < size_max * 0.75)]
-        else:
+        elif size == "big":
             df_items = df_items[size_series > size_max * 0.75]
             
-    if price_status is not None:
+    if len(price_status) > 0:
         price_max = df_items["price"].max()
-        if price_status == "cheap":
-            df_items = df_items[df_items["price"] < price_max * 0.25]
-        elif price_status == "expensive":
-            df_items = df_items[df_items["price"] > price_max * 0.75]
-        elif price_status in ["under","over"] and price is not None:
+        price_min = df_items["price"].min()
+        price_20pct = (price_max - price_min) * 0.2
+        
+        if "between" in price_status and  len(price) > 1:
+            df_items = df_items[(df_items["price"] > price[0]["amount"]) & \
+                        (df_items["price"] < price[1]["amount"])]
+       
+        elif "around" in price_status and len(price) > 0:
+            df_items = df_items[(df_items["price"] > price[0]["amount"] - price_20pct) & \
+                        (df_items["price"] < price_20pct + price[0]["amount"])]
+        
+        elif ("under" in price_status or "over" in price_status) and len(price) > 0:
             if price_status == "under":
-                df_items = df_items[df_items["price"] < price["amount"]]
+                df_items = df_items[df_items["price"] < price[0]["amount"]]
             else:
-                df_items = df_items[df_items["price"] > price["amount"]]
-    
+                df_items = df_items[df_items["price"] > price[0]["amount"]]
+                
+        elif "cheap" in price_status:
+            df_items = df_items[df_items["price"] < price_max * 0.25]
+            
+        elif "expensive" in price_status:
+            df_items = df_items[df_items["price"] > price_max * 0.75]
+        
+        else:
+            return tell("It seems you are trying to tell the price but I cannot tell what it is")
+
     if len(df_items) > 0:
         global items_indices
         items_indices = list(df_items.index)
@@ -102,14 +129,14 @@ def find_items_yes_action():
 def find_items_extremes_action(price_status,size):
     
     answer = tell("I can't find that item")
-    if price_status is not None:
-        if price_status == "cheap":
+    if len(price_status) > 0:
+        if "cheap" in price_status:
             j = df_items.iloc[:,12].idxmin() 
             answer = tell(df_items.loc[j,"title"] + "\n\n" + smart_truncate(df_items.loc[j,"description"]) + "\n\n" + df_items.loc[j,"url"])
-        if price_status == "expensive":
+        if "expensive" in price_status:
             j = df_items.iloc[:,12].idxmax() 
             answer = tell(df_items.loc[j,"title"] + "\n\n" + smart_truncate(df_items.loc[j,"description"]) + "\n\n" + df_items.loc[j,"url"])
-    elif price_status is None and size is not None:
+    elif size is not None:
         size_series = df_items.iloc[:,8] * df_items.iloc[:,9] * df_items.iloc[:,10]
         if size == "small":
             j = size_series.idxmin() 
