@@ -5,17 +5,13 @@ import numpy as np
 import os
 
 
-#"queryResult": 
-#"sentimentAnalysisResult": {
-#            "queryTextSentiment": {
-#                "score": -0.4,
-#                "magnitude": 0.4
-#            }
-
 app = Flask(__name__)
 assist = Assistant(app, route='/',project_id="paskaita-vdul")
 
 df = pd.read_pickle("df.pkl")
+
+df_christmas = pd.read_pickle("df_christmas.pkl")
+
 
 x = df[~df["subtype"].duplicated()].copy()
 x["url"] = x["url"].str.extract("(.+/)")
@@ -43,6 +39,22 @@ def find_category_action(category):
         return tell("You can find " + category + " in " + dictionary_of_urls[category])
     except KeyError:
         return tell("I'm not sure what category of items you are looking for")
+
+
+
+@assist.action('find_christmas')
+def find_christmas_action():
+    df_items = df_christmas.sample(1).iloc[0,:]
+    return tell(df_items["title"] + "\n\n" + smart_truncate(df_items["description"]) + "\n\n" + df_items["url"])
+
+
+
+@assist.action('find_random')
+def find_random_action():
+    df_items = df.sample(1).iloc[0,:]
+    return tell(df_items["title"] + "\n\n" + smart_truncate(df_items["description"]) + "\n\n" + df_items["url"])
+
+
 
 @assist.action('find_items',mapping={'price': 'sys.unit-currency'},default={"price_status":"cheap"})
 def find_items_action(category,price_status,price,size):
