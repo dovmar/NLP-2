@@ -1,15 +1,11 @@
 # NLP-2 užduotis 2
 
-Antra užduotis reikalaus realizuoti virtualu asistenta (angl. virtual assistant) naudojant Google
-Assistant savo pirmai individualiai užduociai. Sukurti bendrine komunikacija tipiniais klausimais.
-
+Realizuoti virtualų asistentą (angl. virtual assistant) naudojant Google
+Assistant savo pirmai individualiai užduočiai. Sukurti bendrinę komunikaciją tipiniais klausimais.
 
 Papildoma užduotis:
-- Padaryti, funkcines užklausas (pvz: kokia preke pigiausia atsakymas priklauso nuo paskaiciuojamos
+- Padaryti, funkcines užklausas (pvz: kokia prekė pigiausia atsakymas priklauso nuo paskaičiuojamos
 užklausos) per API.
-- Paleisti virtualu asistenta ant debesu kompiuterijoje veikiancio puslapio.
-1
-
 
 
 [Asistentas gali būti pamatytas čia](https://dovmar.github.io/NLP-2/)
